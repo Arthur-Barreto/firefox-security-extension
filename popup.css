@@ -1,0 +1,46 @@
+body {
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    min-width: 300px;
+    /* Mínimo recomendado para legibilidade */
+    max-width: 600px;
+    /* Máximo para evitar que o popup seja muito largo */
+}
+
+#dropdown {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+#dropdown li {
+    padding: 8px;
+    background-color: #f8f8f8;
+    margin-top: 2px;
+    word-wrap: break-word;
+    /* Quebra de linha para textos longos */
+    overflow-wrap: break-word;
+    /* Garante que o texto não saia do elemento */
+    border: none !important;
+    /* Removendo bordas explicitamente */
+    box-shadow: none !important;
+    /* Remove sombras que podem parecer bordas */
+    outline: none !important;
+    /* Remove qualquer contorno que possa aparecer */
+}
+
+button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 0;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
