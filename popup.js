@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         browser.runtime.sendMessage({ action: "get_connections", tabId: tabs[0].id }, function (response) {
             const connections = response.connections;
             if (connections && connections.length > 0) {
-                countDiv.textContent = `Número de conexões: ${connections.length}`;
+                countDiv.textContent = `Conexões de Terceiros: ${connections.length}`;
                 connections.forEach(url => {
                     let li = document.createElement('li');
                     li.textContent = url;

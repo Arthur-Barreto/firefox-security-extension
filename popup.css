@@ -7,6 +7,13 @@ body {
     /* Máximo para evitar que o popup seja muito largo */
 }
 
+body h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    color: #e02f03;
+}
+
 #dropdown {
     list-style-type: none;
     padding: 0;
@@ -18,15 +25,10 @@ body {
     background-color: #f8f8f8;
     margin-top: 2px;
     word-wrap: break-word;
-    /* Quebra de linha para textos longos */
     overflow-wrap: break-word;
-    /* Garante que o texto não saia do elemento */
     border: none !important;
-    /* Removendo bordas explicitamente */
     box-shadow: none !important;
-    /* Remove sombras que podem parecer bordas */
     outline: none !important;
-    /* Remove qualquer contorno que possa aparecer */
 }
 
 button {
