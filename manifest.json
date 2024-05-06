@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "name": "plugin segurança 4",
+    "name": "plugin segurança 2",
     "version": "1.0.1",
     "description": "Uma extensão para gerenciar solicitações de terceiros e isolar abas em contêineres",
     "permissions": [
