@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plugin de segurança</title>
     <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
-    <h1>Plugin de segurança</h1>
-    <div id="count"></div>
-    <button id="toggleButton" style="display: none;">Mostrar Conexões</button>
-    <div id="dropdown" style="display: none;">
-        <ul id="results"></ul>
+    <h1>Plugin de Segurança</h1>
+
+    <div id="connectionsCount"></div>
+    <button id="toggleConnectionsButton" style="display: none;">Mostrar Conexões</button>
+    <div id="connectionsDropdown" style="display: none;">
+        <ul id="connectionsResults"></ul>
     </div>
 
-    <!-- Seção para potenciais ameaças -->
+    <div id="servicesCount"></div>
+    <button id="toggleServicesButton" style="display: none;">Mostrar Serviços Suspeitos</button>
+    <div id="servicesDropdown" style="display: none;">
+        <ul id="servicesResults"></ul>
+    </div>
+
     <div id="threatsCount"></div>
     <button id="toggleThreatsButton" style="display: none;">Mostrar Ameaças</button>
     <div id="threatsDropdown" style="display: none;">
@@ -23,4 +31,5 @@
 
     <script src="popup.js"></script>
 </body>
+
 </html>
