@@ -2,64 +2,85 @@ body {
     padding: 10px;
     font-family: Arial, sans-serif;
     min-width: 300px;
-    /* Mínimo recomendado para legibilidade */
     max-width: 600px;
-    /* Máximo para evitar que o popup seja muito largo */
 }
 
-body h1 {
-    margin: 0;
+h1 {
+    margin-bottom: 20px;
     padding: 0;
     font-size: 20px;
     color: #e02f03;
+    /* Vermelho */
 }
 
-#dropdown {
+.section {
+    margin-top: 20px;
+    /* Espaço entre seções */
+    margin-bottom: 20px;
+}
+
+#connectionsCount,
+#servicesCount,
+#threatsCount {
+    font-size: 16px;
+    color: #007BFF;
+    /* Azul */
+    margin-bottom: 2px;
+    /* Espaço reduzido acima do botão */
+}
+
+#servicesCount {
+    color: #6c5ce7;
+    /* Roxo */
+    margin-top: 25px;
+    /* Espaço aumentado após o botão */
+}
+
+#threatsCount {
+    color: #f39c12;
+    /* Laranja */
+    margin-top: 25px;
+    /* Espaço aumentado após o botão */
+}
+
+#dropdown,
+#threatsDropdown,
+#connectionsDropdown,
+#servicesDropdown {
     list-style-type: none;
     padding: 0;
-    margin-top: 10px;
+    margin-top: 5px;
+    display: none;
 }
 
-#dropdown li {
+#dropdown li,
+#threatsDropdown li,
+#connectionsDropdown li,
+#servicesDropdown li {
     padding: 8px;
     background-color: #f8f8f8;
     margin-top: 2px;
     word-wrap: break-word;
+    /* Assegura quebra de texto para textos longos */
     overflow-wrap: break-word;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+    /* Quebra de texto para prevenir overflow */
 }
 
 button {
     display: block;
     width: 100%;
     margin-top: 10px;
+    /* Espaço reduzido acima do botão */
     padding: 10px 0;
     background-color: #007BFF;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-bottom: 20px;
+    /* Espaço aumentado abaixo do botão para separar das seções */
 }
 
 button:hover {
     background-color: #0056b3;
-}
-
-#threatsDropdown {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 10px;
-    display: none;
-}
-
-#threatsDropdown li {
-    padding: 8px;
-    background-color: #f8f8f8;
-    margin-top: 2px;
-    word-wrap: break-word;
-    border: none;
-    box-shadow: none;
-    outline: none;
 }
