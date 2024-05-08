@@ -21,7 +21,9 @@ h1 {
 
 #connectionsCount,
 #servicesCount,
-#threatsCount {
+#threatsCount,
+#cookiesCount,
+#cookiesCount3 {
     font-size: 16px;
     color: #007BFF;
     /* Azul */
@@ -36,9 +38,17 @@ h1 {
     /* Espaço aumentado após o botão */
 }
 
-#threatsCount {
+#threatsCount,
+#cookiesCount {
     color: #f39c12;
     /* Laranja */
+    margin-top: 25px;
+    /* Espaço aumentado após o botão */
+}
+
+#cookiesCount3 {
+    color: #b8037b;
+    /* Verde */
     margin-top: 25px;
     /* Espaço aumentado após o botão */
 }
@@ -46,7 +56,9 @@ h1 {
 #dropdown,
 #threatsDropdown,
 #connectionsDropdown,
-#servicesDropdown {
+#servicesDropdown,
+#cookiesDropdown,
+#cookiesDropdown3 {
     list-style-type: none;
     padding: 0;
     margin-top: 5px;
@@ -56,7 +68,9 @@ h1 {
 #dropdown li,
 #threatsDropdown li,
 #connectionsDropdown li,
-#servicesDropdown li {
+#servicesDropdown li,
+#cookiesDropdown li,
+#cookiesDropdown3 li {
     padding: 8px;
     background-color: #f8f8f8;
     margin-top: 2px;
