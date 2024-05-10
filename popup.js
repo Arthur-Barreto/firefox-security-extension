@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const scoreSite = document.getElementById('scoreSite');
 
-    // Obter o ID da aba atual
     browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currentTabId = tabs[0].id;
         requestConnections(currentTabId);
@@ -56,8 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let sessionStorageScore = 0;
         let canvasScore = 0;
 
-        // Assuming 10 is the worst-case number of items and gets a score of 0,
-        // each item less than 10 improves the score
         connectionsScore = connectionsResults.children.length * 0.15;
         servicesScore = servicesResults.children.length * 0.3;
         cookiesScore = cookiesResults.children.length * 0.1;
@@ -68,16 +65,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const finalScore = connectionsScore + servicesScore + cookiesScore + cookiesScore3 + localStorageScore + sessionStorageScore + canvasScore;
         console.log(`connectionsScore: ${connectionsScore}, servicesScore: ${servicesScore}, cookiesScore: ${cookiesScore}, cookiesScore3: ${cookiesScore3}, localStorageScore: ${localStorageScore}, sessionStorageScore: ${sessionStorageScore}, canvasScore: ${canvasScore}, finalScore: ${finalScore}`)
-        // se maior que 10, limita a 10
+
         if (finalScore > 10) {
             finalScore = 10;
         }
 
-        // Display the score
         scoreSite.textContent = `Score Vulnerabilidade: ${finalScore.toFixed(2)}`;
     }
 
-    // Recalculate the score whenever any of the variables used changes
     connectionsResults.addEventListener('DOMSubtreeModified', calculateScore);
     servicesResults.addEventListener('DOMSubtreeModified', calculateScore);
     cookiesResults.addEventListener('DOMSubtreeModified', calculateScore);
@@ -85,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
     localStorageResults.addEventListener('DOMSubtreeModified', calculateScore);
     sessionStorageResults.addEventListener('DOMSubtreeModified', calculateScore);
     canvasResults.addEventListener('DOMSubtreeModified', calculateScore);
-
 
     function requestConnections(tabId) {
         browser.runtime.sendMessage({ action: "get_connections", tabId: tabId }, function (response) {
@@ -188,19 +182,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 canvasCountDiv.textContent = "Canvas fingerprint detected";
                 toggleCanvasButton.style.display = 'block';
                 canvasResults.textContent = response.data;
-                console.log("Canvas fingerprint data:", response.data);
             } else {
                 canvasCountDiv.textContent = "No canvas fingerprint detected";
                 toggleCanvasButton.style.display = 'none';
-                console.log("No canvas fingerprint detected");
             }
         });
     }
 
 
     function populateList(listElement, items, type) {
-        listElement.innerHTML = ''; // Clear previous items
-        if (type === 'storage') { // Handle storage differently
+        listElement.innerHTML = '';
+        if (type === 'storage') {
             Object.entries(items).forEach(([key, value]) => {
                 let li = document.createElement('li');
                 li.textContent = `${key}: ${value}`;

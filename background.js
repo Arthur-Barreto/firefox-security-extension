@@ -1,12 +1,9 @@
-console.log('Script de fundo carregado');
-
 let connectionsByTab = {};
 let suspiciousServicesByTab = {};
 let cookieDetailsByTab = {};
 let localStorageByTab = {};
 let canvasFingerprintByTab = {};
 
-// Dicionário para identificação de serviços com base na porta
 const servicePorts = {
     "21": "FTP",
     "22": "SSH",
@@ -22,7 +19,6 @@ const servicePorts = {
     "8443": "HTTPS Alternative"
 };
 
-// Listener para requisições web
 browser.webRequest.onBeforeRequest.addListener(
     function (details) {
         if (details.tabId !== -1 && details.originUrl && new URL(details.url).hostname !== new URL(details.originUrl).hostname) {
@@ -30,15 +26,11 @@ browser.webRequest.onBeforeRequest.addListener(
                 connectionsByTab[details.tabId] = {};
             }
             connectionsByTab[details.tabId][details.url] = (connectionsByTab[details.tabId][details.url] || 0) + 1;
-            //console.log('Requisição para domínio de terceira parte:', details.url);
         }
 
         let url = new URL(details.url);
-        let port = url.port || (url.protocol === 'https:' ? '443' : '80'); // Default ports for http and https
+        let port = url.port || (url.protocol === 'https:' ? '443' : '80');
 
-        //console.log('Verificando porta:', port);
-
-        // Check if the port is non-standard (not 80 or 443)
         if (port !== '80' && port !== '443') {
             let service = servicePorts[port] || `Unknown service on port ${port}`;
             let serviceInfo = `${service} at ${url.hostname}:${port}`;
@@ -47,14 +39,12 @@ browser.webRequest.onBeforeRequest.addListener(
             }
             suspiciousServicesByTab[details.tabId][serviceInfo] = (suspiciousServicesByTab[details.tabId][serviceInfo] || 0) + 1;
             alert(`Serviço suspeito detectado: ${serviceInfo}`);
-            //console.log('Serviço suspeito detectado:', serviceInfo);
         }
     },
     { urls: ["<all_urls>"] },
     ["blocking"]
 );
 
-// Listener para capturar cookies na resposta
 browser.webRequest.onHeadersReceived.addListener(
     function (details) {
         if (details.tabId !== -1) {
@@ -92,8 +82,6 @@ browser.webRequest.onHeadersReceived.addListener(
 
 browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     let tabId = sender.tab ? sender.tab.id : request.tabId;
-
-    console.log("Received action:", request.action, "from tab:", sender.tab ? sender.tab.id : "No tab");
 
     switch (request.action) {
         case "get_connections":
@@ -140,25 +128,21 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             break;
         default:
             console.log("Unknown action:", request.action);
-            // Add a comma after the console.log statement
             break;
     }
-    return true; // Indica que a resposta pode ser assíncrona
+    return true; 
 });
 
 
-// Limpa as conexões ao fechar a aba
 browser.tabs.onRemoved.addListener(function (tabId) {
     delete connectionsByTab[tabId];
     delete suspiciousServicesByTab[tabId];
     delete cookieDetailsByTab[tabId];
     delete localStorageByTab[tabId];
     delete canvasFingerprintByTab[tabId];
-    console.log(`Cookie data cleared for tab ${tabId}`);
 
 });
 
-// Limpa as conexões quando uma aba é atualizada
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === "loading") {
         connectionsByTab[tabId] = {};
@@ -169,7 +153,6 @@ browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     }
 });
 
-// Função para enviar detalhes dos cookies para o popup ou onde for necessário
 function getCookiesDetails(tabId) {
     let details = cookieDetailsByTab[tabId];
     if (details) {
@@ -199,7 +182,7 @@ function getLocalStorage(tabId, sendResponse) {
         console.error(`Error executing script in tab ${tabId}:`, error);
         sendResponse({ error: error.message });
     });
-    return true; // This is crucial for async sendResponse
+    return true;
 }
 
 function getCanvasFingerprint() {
