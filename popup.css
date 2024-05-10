@@ -27,6 +27,7 @@ h1 {
     /* Espaço reduzido acima do botão */
 
 }
+
 #servicesCount,
 #threatsCount,
 #cookiesCount,
@@ -67,6 +68,17 @@ h1 {
     /* Espaço aumentado após o botão */
 }
 
+#localStorageResults li,
+#sessionStorageResults li {
+    padding: 8px;
+    background-color: #f8f8f8;
+    margin-top: 2px;
+    word-wrap: break-word;
+    /* Assegura quebra de texto para textos longos */
+    overflow-wrap: break-word;
+    /* Quebra de texto para prevenir overflow */
+}
+
 #sessionStorageCount {
     color: #9a00d6;
     /* Verde */
@@ -91,7 +103,9 @@ h1 {
 #connectionsDropdown li,
 #servicesDropdown li,
 #cookiesDropdown li,
-#cookiesDropdown3 li {
+#cookiesDropdown3 li,
+#localStorageResults li,
+#sessionStorageResults li {
     padding: 8px;
     background-color: #f8f8f8;
     margin-top: 2px;
