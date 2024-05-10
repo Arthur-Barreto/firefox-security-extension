@@ -29,6 +29,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const sessionStorageDropdown = document.getElementById('sessionStorageDropdown');
     const sessionStorageResults = document.getElementById('sessionStorageResults');
 
+    const canvasCountDiv = document.getElementById('canvasCount');
+    const toggleCanvasButton = document.getElementById('toggleCanvasButton');
+    const canvasDropdown = document.getElementById('canvasDropdown');
+    const canvasResults = document.getElementById('canvasResults');
+
     // Obter o ID da aba atual
     browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currentTabId = tabs[0].id;
@@ -36,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         requestServices(currentTabId);
         requestCookies(currentTabId);
         requestLocalStorage(currentTabId);
+        requestCanvasFingerprint(currentTabId);
     });
 
     function requestConnections(tabId) {
@@ -133,6 +139,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function requestCanvasFingerprint(tabId) {
+        browser.runtime.sendMessage({ action: "get_canvas_fingerprint", tabId: tabId }, function (response) {
+            if (response && response.data) {
+                canvasCountDiv.textContent = "Canvas fingerprint detected";
+                toggleCanvasButton.style.display = 'block';
+                canvasResults.textContent = response.data;
+                console.log("Canvas fingerprint data:", response.data);
+            } else {
+                canvasCountDiv.textContent = "No canvas fingerprint detected";
+                toggleCanvasButton.style.display = 'none';
+                console.log("No canvas fingerprint detected");
+            }
+        });
+    }
+
 
     function populateList(listElement, items, type) {
         listElement.innerHTML = ''; // Clear previous items
@@ -150,7 +171,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
-
 
     function toggleDropdown(dropdown, button, showText, hideText) {
         if (dropdown.style.display === 'block') {
@@ -184,5 +204,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     toggleSessionStorageButton.addEventListener('click', () => {
         toggleDropdown(sessionStorageDropdown, toggleSessionStorageButton, 'Mostrar Session Storage', 'Esconder Session Storage');
+    });
+
+    toggleCanvasButton.addEventListener('click', () => {
+        toggleDropdown(canvasDropdown, toggleCanvasButton, 'Mostrar Canvas Fingerprint', 'Esconder Canvas Fingerprint');
     });
 });

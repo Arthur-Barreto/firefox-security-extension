@@ -4,6 +4,7 @@ let connectionsByTab = {};
 let suspiciousServicesByTab = {};
 let cookieDetailsByTab = {};
 let localStorageByTab = {};
+let canvasFingerprintByTab = {};
 
 // Dicionário para identificação de serviços com base na porta
 const servicePorts = {
@@ -20,31 +21,6 @@ const servicePorts = {
     "8080": "HTTP Alternative",
     "8443": "HTTPS Alternative"
 };
-
-function getLocalStorage(tabId, sendResponse) {
-    browser.tabs.executeScript(tabId, {
-        code: `
-            JSON.stringify({
-                localStorageCount: Object.keys(localStorage).length,
-                sessionStorageCount: Object.keys(sessionStorage).length,
-                localStorage: Object.entries(localStorage).reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {}),
-                sessionStorage: Object.entries(sessionStorage).reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
-            });
-        `
-    }).then(results => {
-        if (results && results[0]) {
-            const data = JSON.parse(results[0]);
-            sendResponse({ data: data });
-        } else {
-            sendResponse({ error: "No data received" });
-        }
-    }).catch(error => {
-        console.error(`Error executing script in tab ${tabId}:`, error);
-        sendResponse({ error: error.message });
-    });
-    return true; // This is crucial for async sendResponse
-}
-
 
 // Listener para requisições web
 browser.webRequest.onBeforeRequest.addListener(
@@ -140,8 +116,31 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     sendResponse({ error: "No active tab found" });
                 }
             });
+        case "get_canvas_fingerprint":
+            browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
+                if (tabs.length > 0) {
+                    browser.tabs.executeScript(tabs[0].id, {
+                        code: `(${getCanvasFingerprint.toString()})()`
+                    }).then(results => {
+                        if (results && results[0]) {
+                            sendResponse({ data: results[0] });
+                            console.log(`Canvas fingerprint data sent for tab ${tabId}`);
+                        } else {
+                            sendResponse({ error: "No data received" });
+                            console.error(`No data received for canvas fingerprint in tab ${tabId}`);
+                        }
+                    }).catch(error => {
+                        console.error(`Error executing script in tab ${tabId}:`, error);
+                        sendResponse({ error: error.message });
+                    });
+                } else {
+                    sendResponse({ error: "No active tab found" });
+                }
+            });
+            break;
         default:
             console.log("Unknown action:", request.action);
+            // Add a comma after the console.log statement
             break;
     }
     return true; // Indica que a resposta pode ser assíncrona
@@ -154,6 +153,7 @@ browser.tabs.onRemoved.addListener(function (tabId) {
     delete suspiciousServicesByTab[tabId];
     delete cookieDetailsByTab[tabId];
     delete localStorageByTab[tabId];
+    delete canvasFingerprintByTab[tabId];
     console.log(`Cookie data cleared for tab ${tabId}`);
 
 });
@@ -165,6 +165,7 @@ browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         suspiciousServicesByTab[tabId] = {};
         cookieDetailsByTab[tabId] = { firstParty: 0, thirdParty: 0, firstPartyDetails: {}, thirdPartyDetails: {} };
         localStorageByTab[tabId] = {};
+        canvasFingerprintByTab[tabId] = {};
     }
 });
 
@@ -175,4 +176,44 @@ function getCookiesDetails(tabId) {
         return { firstPartyDetails: details.firstParty, thirdPartyDetails: details.thirdParty };
     }
     return { firstPartyDetails: {}, thirdPartyDetails: {} };
+}
+
+function getLocalStorage(tabId, sendResponse) {
+    browser.tabs.executeScript(tabId, {
+        code: `
+            JSON.stringify({
+                localStorageCount: Object.keys(localStorage).length,
+                sessionStorageCount: Object.keys(sessionStorage).length,
+                localStorage: Object.entries(localStorage).reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {}),
+                sessionStorage: Object.entries(sessionStorage).reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+            });
+        `
+    }).then(results => {
+        if (results && results[0]) {
+            const data = JSON.parse(results[0]);
+            sendResponse({ data: data });
+        } else {
+            sendResponse({ error: "No data received" });
+        }
+    }).catch(error => {
+        console.error(`Error executing script in tab ${tabId}:`, error);
+        sendResponse({ error: error.message });
+    });
+    return true; // This is crucial for async sendResponse
+}
+
+function getCanvasFingerprint() {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var txt = 'CANVAS_FINGERPRINT';
+    ctx.textBaseline = "top";
+    ctx.font = "14px 'Arial'";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#f60";
+    ctx.fillRect(125, 1, 62, 20);
+    ctx.fillStyle = "#069";
+    ctx.fillText(txt, 2, 15);
+    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+    ctx.fillText(txt, 4, 17);
+    return canvas.toDataURL();
 }

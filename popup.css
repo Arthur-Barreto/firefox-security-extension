@@ -86,12 +86,20 @@ h1 {
     /* Espaço aumentado após o botão */
 }
 
+#canvasCount {
+    color: #00d8a6;
+    /* Verde */
+    margin-top: 25px;
+    /* Espaço aumentado após o botão */
+}
+
 #dropdown,
 #threatsDropdown,
 #connectionsDropdown,
 #servicesDropdown,
 #cookiesDropdown,
-#cookiesDropdown3 {
+#cookiesDropdown3,
+#canvasDropdown {
     list-style-type: none;
     padding: 0;
     margin-top: 5px;
@@ -105,7 +113,8 @@ h1 {
 #cookiesDropdown li,
 #cookiesDropdown3 li,
 #localStorageResults li,
-#sessionStorageResults li {
+#sessionStorageResults li,
+#ccanvasResults li {
     padding: 8px;
     background-color: #f8f8f8;
     margin-top: 2px;
