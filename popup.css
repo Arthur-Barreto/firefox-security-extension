@@ -19,20 +19,27 @@ h1 {
     margin-bottom: 20px;
 }
 
-#connectionsCount,
+#connectionsCount {
+    font-size: 16px;
+    color: #ac0360;
+    /* Azul */
+    margin-bottom: 2px;
+    /* Espaço reduzido acima do botão */
+
+}
 #servicesCount,
 #threatsCount,
 #cookiesCount,
 #cookiesCount3 {
     font-size: 16px;
-    color: #007BFF;
+    color: #382d07;
     /* Azul */
     margin-bottom: 2px;
     /* Espaço reduzido acima do botão */
 }
 
 #servicesCount {
-    color: #6c5ce7;
+    color: #616161;
     /* Roxo */
     margin-top: 25px;
     /* Espaço aumentado após o botão */
@@ -47,7 +54,21 @@ h1 {
 }
 
 #cookiesCount3 {
-    color: #b8037b;
+    color: #fdd700;
+    /* Verde */
+    margin-top: 25px;
+    /* Espaço aumentado após o botão */
+}
+
+#localStorageCount {
+    color: #0094d8;
+    /* Vermelho */
+    margin-top: 25px;
+    /* Espaço aumentado após o botão */
+}
+
+#sessionStorageCount {
+    color: #9a00d6;
     /* Verde */
     margin-top: 25px;
     /* Espaço aumentado após o botão */

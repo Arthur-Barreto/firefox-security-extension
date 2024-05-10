@@ -19,12 +19,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const cookiesDropdown3 = document.getElementById('cookiesDropdown3');
     const cookiesResults3 = document.getElementById('cookiesResults3');
 
+    const localStorageCountDiv = document.getElementById('localStorageCount');
+    const toggleLocalStorageButton = document.getElementById('toggleLocalStorageButton');
+    const localStorageDropdown = document.getElementById('localStorageDropdown');
+    const localStorageResults = document.getElementById('localStorageResults');
+
+    const sessionStorageCountDiv = document.getElementById('sessionStorageCount');
+    const toggleSessionStorageButton = document.getElementById('toggleSessionStorageButton');
+    const sessionStorageDropdown = document.getElementById('sessionStorageDropdown');
+    const sessionStorageResults = document.getElementById('sessionStorageResults');
+
     // Obter o ID da aba atual
     browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currentTabId = tabs[0].id;
         requestConnections(currentTabId);
         requestServices(currentTabId);
         requestCookies(currentTabId);
+        requestLocalStorage(currentTabId);
     });
 
     function requestConnections(tabId) {
@@ -83,16 +94,63 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function requestLocalStorage(tabId) {
+        browser.runtime.sendMessage({ action: "get_local_storage", tabId: tabId }, function (response) {
+            if (!response) {
+                console.error("No response received");
+                return;
+            }
+            if (response.error) {
+                console.error("Error fetching storage:", response.error);
+                return;
+            }
 
-    function populateList(listElement, items, type) {
-        listElement.innerHTML = '';
-        Object.keys(items).forEach(item => {
-            const count = items[item];
-            let li = document.createElement('li');
-            li.textContent = `${item} (detectado ${count} vezes)`;
-            listElement.appendChild(li);
+            if (response.data) {
+                const { localStorage, sessionStorage } = response.data;
+                if (localStorage && Object.keys(localStorage).length > 0) {
+                    localStorageCountDiv.textContent = `Local Storage: ${Object.keys(localStorage).length}`;
+                    toggleLocalStorageButton.style.display = 'block';
+                    populateList(localStorageResults, localStorage, 'storage');
+                } else {
+                    localStorageCountDiv.textContent = "No local storage detected.";
+                    toggleLocalStorageButton.style.display = 'none';
+                }
+
+                if (sessionStorage && Object.keys(sessionStorage).length > 0) {
+                    sessionStorageCountDiv.textContent = `Session Storage: ${Object.keys(sessionStorage).length}`;
+                    toggleSessionStorageButton.style.display = 'block';
+                    populateList(sessionStorageResults, sessionStorage, 'storage');
+                } else {
+                    sessionStorageCountDiv.textContent = "No session storage detected.";
+                    toggleSessionStorageButton.style.display = 'none';
+                }
+            } else {
+                localStorageCountDiv.textContent = "No local storage detected.";
+                sessionStorageCountDiv.textContent = "No session storage detected.";
+                toggleLocalStorageButton.style.display = 'none';
+                toggleSessionStorageButton.style.display = 'none';
+            }
         });
     }
+
+
+    function populateList(listElement, items, type) {
+        listElement.innerHTML = ''; // Clear previous items
+        if (type === 'storage') { // Handle storage differently
+            Object.entries(items).forEach(([key, value]) => {
+                let li = document.createElement('li');
+                li.textContent = `${key}: ${value}`;
+                listElement.appendChild(li);
+            });
+        } else {
+            Object.keys(items).forEach(key => {
+                let li = document.createElement('li');
+                li.textContent = `${key} (detected ${items[key]} times)`;
+                listElement.appendChild(li);
+            });
+        }
+    }
+
 
     function toggleDropdown(dropdown, button, showText, hideText) {
         if (dropdown.style.display === 'block') {
@@ -118,5 +176,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     toggleCookiesButton3.addEventListener('click', () => {
         toggleDropdown(cookiesDropdown3, toggleCookiesButton3, 'Mostrar Cookies - 3 parte', 'Esconder Cookies - 3 parte');
+    });
+
+    toggleLocalStorageButton.addEventListener('click', () => {
+        toggleDropdown(localStorageDropdown, toggleLocalStorageButton, 'Mostrar Local Storage', 'Esconder Local Storage');
+    });
+
+    toggleSessionStorageButton.addEventListener('click', () => {
+        toggleDropdown(sessionStorageDropdown, toggleSessionStorageButton, 'Mostrar Session Storage', 'Esconder Session Storage');
     });
 });

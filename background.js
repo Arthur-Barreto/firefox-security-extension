@@ -3,6 +3,7 @@ console.log('Script de fundo carregado');
 let connectionsByTab = {};
 let suspiciousServicesByTab = {};
 let cookieDetailsByTab = {};
+let localStorageByTab = {};
 
 // Dicionário para identificação de serviços com base na porta
 const servicePorts = {
@@ -19,6 +20,31 @@ const servicePorts = {
     "8080": "HTTP Alternative",
     "8443": "HTTPS Alternative"
 };
+
+function getLocalStorage(tabId, sendResponse) {
+    browser.tabs.executeScript(tabId, {
+        code: `
+            JSON.stringify({
+                localStorageCount: Object.keys(localStorage).length,
+                sessionStorageCount: Object.keys(sessionStorage).length,
+                localStorage: Object.entries(localStorage).reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {}),
+                sessionStorage: Object.entries(sessionStorage).reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+            });
+        `
+    }).then(results => {
+        if (results && results[0]) {
+            const data = JSON.parse(results[0]);
+            sendResponse({ data: data });
+        } else {
+            sendResponse({ error: "No data received" });
+        }
+    }).catch(error => {
+        console.error(`Error executing script in tab ${tabId}:`, error);
+        sendResponse({ error: error.message });
+    });
+    return true; // This is crucial for async sendResponse
+}
+
 
 // Listener para requisições web
 browser.webRequest.onBeforeRequest.addListener(
@@ -89,19 +115,34 @@ browser.webRequest.onHeadersReceived.addListener(
 
 
 browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.action === "get_connections") {
-        let tabId = request.tabId;
-        let connections = connectionsByTab[tabId] ? connectionsByTab[tabId] : {};
-        sendResponse({ connections: connections });
-    } else if (request.action === "get_suspicious_services") {
-        let tabId = request.tabId;
-        let services = suspiciousServicesByTab[tabId] ? suspiciousServicesByTab[tabId] : {};
-        sendResponse({ services: services });
-    } else if (request.action === "get_cookies") {
-        let tabId = request.tabId;
-        let cookies = cookieDetailsByTab[tabId] || { firstParty: 0, thirdParty: 0, firstPartyDetails: {}, thirdPartyDetails: {} };
-        sendResponse({ cookies: cookies });
-        console.log(`Sending cookie data for tab ${tabId}:`, cookies);
+    let tabId = sender.tab ? sender.tab.id : request.tabId;
+
+    console.log("Received action:", request.action, "from tab:", sender.tab ? sender.tab.id : "No tab");
+
+    switch (request.action) {
+        case "get_connections":
+            let connections = connectionsByTab[tabId] ? connectionsByTab[tabId] : {};
+            sendResponse({ connections: connections });
+            break;
+        case "get_suspicious_services":
+            let services = suspiciousServicesByTab[tabId] ? suspiciousServicesByTab[tabId] : {};
+            sendResponse({ services: services });
+            break;
+        case "get_cookies":
+            let cookies = cookieDetailsByTab[tabId] || { firstParty: 0, thirdParty: 0, firstPartyDetails: {}, thirdPartyDetails: {} };
+            sendResponse({ cookies: cookies });
+            console.log(`Sending cookie data for tab ${tabId}:`, cookies);
+        case "get_local_storage":
+            browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
+                if (tabs.length > 0) {
+                    getLocalStorage(tabs[0].id, sendResponse);
+                } else {
+                    sendResponse({ error: "No active tab found" });
+                }
+            });
+        default:
+            console.log("Unknown action:", request.action);
+            break;
     }
     return true; // Indica que a resposta pode ser assíncrona
 });
@@ -112,6 +153,7 @@ browser.tabs.onRemoved.addListener(function (tabId) {
     delete connectionsByTab[tabId];
     delete suspiciousServicesByTab[tabId];
     delete cookieDetailsByTab[tabId];
+    delete localStorageByTab[tabId];
     console.log(`Cookie data cleared for tab ${tabId}`);
 
 });
@@ -121,6 +163,8 @@ browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === "loading") {
         connectionsByTab[tabId] = {};
         suspiciousServicesByTab[tabId] = {};
+        cookieDetailsByTab[tabId] = { firstParty: 0, thirdParty: 0, firstPartyDetails: {}, thirdPartyDetails: {} };
+        localStorageByTab[tabId] = {};
     }
 });
 
