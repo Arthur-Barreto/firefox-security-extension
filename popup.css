@@ -13,6 +13,15 @@ h1 {
     /* Vermelho */
 }
 
+#scoreSite {
+    font-size: 18px;
+    color: #ffee02;
+    margin-bottom: 2px;
+    /* bold */
+    font-weight: bold;
+
+}
+
 .section {
     margin-top: 20px;
     /* Espaço entre seções */

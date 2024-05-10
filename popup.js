@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const canvasDropdown = document.getElementById('canvasDropdown');
     const canvasResults = document.getElementById('canvasResults');
 
+    const scoreSite = document.getElementById('scoreSite');
+
     // Obter o ID da aba atual
     browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currentTabId = tabs[0].id;
@@ -42,7 +44,48 @@ document.addEventListener('DOMContentLoaded', function () {
         requestCookies(currentTabId);
         requestLocalStorage(currentTabId);
         requestCanvasFingerprint(currentTabId);
+        calculateScore();
     });
+
+    function calculateScore() {
+        let connectionsScore = 0;
+        let servicesScore = 0;
+        let cookiesScore = 0;
+        let cookiesScore3 = 0;
+        let localStorageScore = 0;
+        let sessionStorageScore = 0;
+        let canvasScore = 0;
+
+        // Assuming 10 is the worst-case number of items and gets a score of 0,
+        // each item less than 10 improves the score
+        connectionsScore = connectionsResults.children.length * 0.15;
+        servicesScore = servicesResults.children.length * 0.3;
+        cookiesScore = cookiesResults.children.length * 0.1;
+        cookiesScore3 = cookiesResults3.children.length * 0.3;
+        localStorageScore = localStorageResults.children.length * 0.2;
+        sessionStorageScore = sessionStorageResults.children.length * 0.2;
+        canvasScore = canvasResults.textContent ? 0 : 0.25;
+
+        const finalScore = connectionsScore + servicesScore + cookiesScore + cookiesScore3 + localStorageScore + sessionStorageScore + canvasScore;
+        console.log(`connectionsScore: ${connectionsScore}, servicesScore: ${servicesScore}, cookiesScore: ${cookiesScore}, cookiesScore3: ${cookiesScore3}, localStorageScore: ${localStorageScore}, sessionStorageScore: ${sessionStorageScore}, canvasScore: ${canvasScore}, finalScore: ${finalScore}`)
+        // se maior que 10, limita a 10
+        if (finalScore > 10) {
+            finalScore = 10;
+        }
+
+        // Display the score
+        scoreSite.textContent = `Score Vulnerabilidade: ${finalScore.toFixed(2)}`;
+    }
+
+    // Recalculate the score whenever any of the variables used changes
+    connectionsResults.addEventListener('DOMSubtreeModified', calculateScore);
+    servicesResults.addEventListener('DOMSubtreeModified', calculateScore);
+    cookiesResults.addEventListener('DOMSubtreeModified', calculateScore);
+    cookiesResults3.addEventListener('DOMSubtreeModified', calculateScore);
+    localStorageResults.addEventListener('DOMSubtreeModified', calculateScore);
+    sessionStorageResults.addEventListener('DOMSubtreeModified', calculateScore);
+    canvasResults.addEventListener('DOMSubtreeModified', calculateScore);
+
 
     function requestConnections(tabId) {
         browser.runtime.sendMessage({ action: "get_connections", tabId: tabId }, function (response) {
